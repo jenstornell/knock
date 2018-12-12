@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>CONFIG</title>
-  <link rel="stylesheet" href="<?= \knock\option('url'); ?>/assets/css/dist/style.min.css?time=<?= time(); ?>">
+  <link rel="stylesheet" href="<?= \knock\option('url'); ?>/assets/css/dist/knock.min.css?time=<?= time(); ?>">
 </head>
 <body>
 

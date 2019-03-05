@@ -1,0 +1,1 @@
+<?php return hash('sha256', 'test');

@@ -1,19 +1,26 @@
 <?php
 class KnockCore {
-  private $userpath;
-  private $cookiepath;
-
   // Set options
   public function __construct() {
-    $this->basepath = __DIR__;
-    $this->userpath = $this->basepath . '/users/';
-    $this->temp_path = $this->basepath . '/temp/';
-    $this->cookiepath = '/misc/knock/';
-    $this->prefix = 'knock';
+    $this->options();
   }
 
-  private function defaults() {
+  // Login with post variables
+  public function login() {
+    $success = $this->loginUser();
 
+    if($this->o('callback.login')) {
+      return $this->o('callback.login')($success);
+    }
+  }
+
+  // Logout
+  public function logout() {
+    $success = $this->logoutUser();
+
+    if($this->o('callback.logout')) {
+      return $this->o('callback.logout')($success);
+    }
   }
 
   // Check if user is authorized with post variables
@@ -21,53 +28,90 @@ class KnockCore {
     if(!isset($_POST['username'])) return;
     if(!isset($_POST['password'])) return;
     
-    $password = include($this->userpath . $_POST['username'] . '.php');
+    $password = include($this->o('path.users') . $_POST['username'] . '.php');
+    $password_post = hash('sha256', $_POST['password']);
 
-    if($password == $_POST['password']) return true;
+    if($password == $password_post) return true;
   }
 
-  // Login with post variables
-  public function login() {
+  public function isLoggedIn() {
+    if(!isset($_COOKIE[$this->o('prefix')]['username'])) return;
+    if(!isset($_COOKIE[$this->o('prefix')]['hash'])) return;
+
+    $hash = include($this->o('path.temp') . $_COOKIE[$this->o('prefix')]['username'] . '.php');
+    $hash_cookie = $_COOKIE[$this->o('prefix')]['hash'];
+
+    if($hash == $hash_cookie) return true;
+  }
+
+  // Set options
+  private function options() {
+    $path = __DIR__ . '/options.php';
+    
+    if(file_exists($path)) {
+      $this->options = array_merge($this->defaults(), include($path));
+    } else {
+      $this->options = $this->defaults();
+    }
+  }
+
+  // Option helper
+  private function o($key) {
+    return (isset($this->options[$key])) ? $this->options[$key] : null;
+  }
+
+  // Defaults
+  private function defaults() {
+    return [
+      'path.users' => __DIR__ . '/users/',
+      'path.temp' => __DIR__ . '/temp/',
+      'cookie.path' => '/',
+      'cookie.expires' => 2147483647,
+      'prefix' => 'knock',
+    ];
+  }
+
+  // Login user
+  private function loginUser() {
     if(!$this->isAuthorized()) return;
 
     $hash = bin2hex(random_bytes(16));
 
     if(!$this->writeCookie($hash)) return;
     if(!$this->writeFile($hash)) return;
+
+    return true;
   }
 
-  // Logout
-  public function logout() {
-    $this->deleteCookies();
+  // Logout user
+  private function logoutUser() {
+    return $this->deleteCookies();
   }
 
   // Delete cookies
   private function deleteCookies() {
-    if(!setcookie($this->prefix . '[username]', '', 0, $this->cookiepath)) return;
-    if(!setcookie($this->prefix . '[hash]', '', 0, $this->cookiepath)) return;
+    if(!setcookie($this->o('prefix') . '[username]', '', 0, $this->o('cookie.path'))) return;
+    if(!setcookie($this->o('prefix') . '[hash]', '', 0, $this->o('cookie.path'))) return;
+
     return true;
   }
 
   // Write cookie on login
   private function writeCookie($hash) {
-    setcookie($this->prefix . '[username]', $_POST['username'], 2147483647, $this->cookiepath);
-    setcookie($this->prefix . '[hash]', $hash, 2147483647, $this->cookiepath);
+    if(!setcookie($this->o('prefix') . '[username]', $_POST['username'], $this->o('cookie.expires'), $this->o('cookie.path'))) return;
+    if(!setcookie($this->o('prefix') . '[hash]', $hash, $this->o('cookie.expires'), $this->o('cookie.path'))) return;
+
+    return true;
   }
 
   // Write temp file to disc
   private function writeFile($hash) {
-    return file_put_contents($this->temp_path . $_POST['username'] . '.php', "<?php return '" . $hash . "';");
+    return file_put_contents($this->o('path.temp') . $_POST['username'] . '.php', "<?php return '" . $hash . "';");
   }
 }
 
-// Static helper class
+// STATIC CLASS HELPER
 class knock {
-  // isLoggedIn
-  public static function isLoggedIn() {
-    $core = new KnockCore();
-    return $core->isLoggedIn();
-  }
-
   // Login
   public static function login() {
     $core = new KnockCore();
@@ -79,28 +123,16 @@ class knock {
     $core = new KnockCore();
     return $core->logout();
   }
+
+  // isLoggedIn
+  public static function isAuthorized() {
+    $core = new KnockCore();
+    return $core->isAuthorized();
+  }
+
+  // isLoggedIn
+  public static function isLoggedIn() {
+    $core = new KnockCore();
+    return $core->isLoggedIn();
+  }
 }
-
-$_POST['username'] = 'test@example.com';
-$_POST['password'] = 'test';
-
-//echo knock::isLoggedIn();
-//echo knock::login();
-echo knock::logout();
-
-//print_r($_POST);
-
-print_r($_COOKIE);
-
-// TODO
-/*
-cookie expire option
-login hook i options
-logout hook i options
-knock::isLoggedIn()
-Docs - Byt ut test password mot md5
-Docs - options
-Docs - License
-Docs - Donate
-options
-*/

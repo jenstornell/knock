@@ -15,9 +15,17 @@ PHP authorization class for logging in and logging out.
 
 ### Create a user
 
-In the folder `users` you can create users by for example an email with a filename like `test@example.com.php`. The username will then be `test@example.com`.
+The folder structure may look like below where filename should be `[username].php`.
 
-To use the password `test` you first need to hash it with a tool like [SHA256 Hash Generator](https://passwordsgenerator.net/sha256-hash-generator/).
+```text
+└─ users
+   ├─ test@example.com.php
+   └─ hello@example.com.php
+```
+
+#### In `test@example.com.php`
+
+To use the password `test` you need to hash it with a tool like [SHA256 Hash Generator](https://passwordsgenerator.net/sha256-hash-generator/).
 
 ```php
 <?php return '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08';

@@ -83,7 +83,7 @@ if(knock::isAuthorized()) {
 
 You can use this function to see if the user is logged in. It will check if the user `$_COOKIE` hash matches the temp file hash. It will return `true` or `false`.
 
-***Be aware: This function does not work until you refresh the page. That's how `$_COOKIE` works.***
+***Be aware: This function does not work until you refresh the page, or load another page after logging in. That's how `$_COOKIE` works.***
 
 ```php
 <?php

@@ -36,18 +36,28 @@ Inside the user file you return the password. To use the password `test` you nee
 <?php return hash('sha256', 'test');
 ```
 
+### Initialize class
+
+To be able to call any method, you first need to load the class.
+
+```php
+include __DIR__ . '/knock.php';
+```
+
+## Methods
+
+For any method to work, you need to initialize the class like above.
+
 ### knock::login()
 
 You can use this function to login a user. It will check if the user `$_POST` password matches the user file password. If it matches it will write a hash to a temp file and set a `$_COOKIE`.
 
 ```php
 <?php
-include __DIR__ . '/knock.php';
-
 $_POST['username'] = 'test@example.com';
 $_POST['password'] = 'test';
 
-echo knock::login();
+knock::login();
 ```
 
 ### knock::logout()
@@ -56,9 +66,7 @@ You can use this function to logout a user. It will delte the `$_COOKIE` as long
 
 ```php
 <?php
-include __DIR__ . '/knock.php';
-
-echo knock::logout();
+knock::logout();
 ```
 
 ### knock::isAuthorized()
@@ -67,12 +75,12 @@ You can use this function to see if the user that is trying to login is authoriz
 
 ```php
 <?php
-include __DIR__ . '/knock.php';
-
 $_POST['username'] = 'test@example.com';
 $_POST['password'] = 'test';
 
-echo knock::isAuthorized();
+if(knock::isAuthorized()) {
+  echo 'You are authorized';
+}
 ```
 
 ### knock::isLoggedIn()
@@ -83,9 +91,9 @@ You can use this function to see if the user is logged in. It will check if the 
 
 ```php
 <?php
-include __DIR__ . '/knock.php';
+if(!knock::isLoggedIn()) die('You are not allowed to view this page.');
 
-echo knock::isLoggedIn();
+echo 'Welcome user!';
 ```
 
 ## Options (optional)

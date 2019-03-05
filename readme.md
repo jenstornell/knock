@@ -109,7 +109,7 @@ return [
 ### Explained
 
 | Name              | Default                           | Description                                                                                |
-| ----------------- | --------------------------------- | ------- ---------------------------------------------------------------------------------- |
+| ----------------- | --------------------------------- | ------------------------------------------------------------------------------------------ |
 | `path.temp`       | `(string)__DIR__ . '/users/'`     | Path where temporary login data is stored                                                  |
 | `path.users`      | `(string)__DIR__ . '/temp/'`      | Path where user files are stored                                                           |
 | `cookie.path`     | `(string)'/'`                     | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |

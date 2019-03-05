@@ -30,11 +30,7 @@ Inside the user file you return the password. To use the password `test` you nee
 <?php return '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08';
 ```
 
-*You can also to it like below, but it's not very good to make the password visible like that. For testing purpose only!*
-
-```php
-<?php return hash('sha256', 'test');
-```
+*You can also use `<?php return hash('sha256', 'test');`, but it's not recommended. Use it for testing purpose only!*
 
 ### Initialize class
 

@@ -1,6 +1,6 @@
 # Knock
 
-PHP authorization class for logging in and logging out.
+PHP authorization class for logging in and logging out. No form is included.
 
 ## In short
 
@@ -10,6 +10,18 @@ PHP authorization class for logging in and logging out.
 - Plenty of options
 - Hooks triggered after login/logout
 - No dependencies
+
+## Quick example
+
+```php
+<?php
+include __DIR__ . '/knock.php';
+
+$_POST['username'] = 'test@example.com';
+$_POST['password'] = 'test';
+
+knock::login();
+```
 
 ## Usage
 

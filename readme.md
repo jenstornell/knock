@@ -105,8 +105,8 @@ return [
   'cookie.path' => '/',
   'cookie.expires' => 2147483647,
   'prefix' => 'knock',
-  'callback.login' => function() {},
-  'callback.logout' => function() {},
+  'callback.login' => function($success) {},
+  'callback.logout' => function($success) {},
 ];
 ```
 
@@ -117,10 +117,27 @@ return [
 | `path.temp`       | string   | `__DIR__ . '/users/'`   | Path where temporary login data is stored                                                  |
 | `path.users`      | string   | `__DIR__ . '/temp/'`    | Path where user files are stored                                                           |
 | `cookie.path`     | string   | `'/'`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
-| `cookie.expires`  | integer  | `2147483647`       | A timestamp when cookie expires. Default is about 20 years.                                |
+| `cookie.expires`  | integer  | `2147483647`            | A timestamp when cookie expires. Default is about 20 years.                                |
 | `cookie.prefix`   | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
 | `callback.login`  | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
 | `callback.logout` | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
+
+### Callbacks
+
+The callbacks are just options. The differece is that they work like functions, triggered by login or logout. In the `options.php` file you can do like below.
+
+```php
+return [
+  'callback.login' => function($success) {
+    if($success) {
+      header('Location: https://example.com/admin');
+    } else {
+      header('Location: https://example.com/error');
+    }
+    die;
+  }
+];
+```
 
 ## Requirements
 

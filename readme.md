@@ -19,11 +19,10 @@ The folder structure may look like below where filename should be `[username].ph
 
 ```text
 └─ users
-   ├─ test@example.com.php
-   └─ hello@example.com.php
+   └─ test@example.com.php
 ```
 
-#### In `test@example.com.php`
+#### Inside the user file
 
 To use the password `test` you need to hash it with a tool like [SHA256 Hash Generator](https://passwordsgenerator.net/sha256-hash-generator/).
 
@@ -31,7 +30,7 @@ To use the password `test` you need to hash it with a tool like [SHA256 Hash Gen
 <?php return '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08';
 ```
 
-**You can also to it like below, but it's not very good to make the password visible like that. For testing purpose only!**
+*You can also to it like below, but it's not very good to make the password visible like that. For testing purpose only!*
 
 ```php
 <?php return hash('sha256', 'test');

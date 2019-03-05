@@ -13,6 +13,8 @@ PHP authorization class for logging in and logging out. No form is included.
 
 ## Quick example
 
+### Form page
+
 ```php
 <?php
 include __DIR__ . '/knock.php';
@@ -21,6 +23,15 @@ $_POST['username'] = 'test@example.com';
 $_POST['password'] = 'test';
 
 knock::login();
+```
+
+### Destination page
+
+```php
+<?php
+if(!knock::isLoggedIn()) die('You are not allowed to view this page.');
+
+echo 'Welcome user!';
 ```
 
 ## Usage

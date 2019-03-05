@@ -108,15 +108,15 @@ return [
 
 ### Explained
 
-| Name              | Default                           | Description                                                                                |
-| ----------------- | --------------------------------- | ------------------------------------------------------------------------------------------ |
-| `path.temp`       | `(string)__DIR__ . '/users/'`     | Path where temporary login data is stored                                                  |
-| `path.users`      | `(string)__DIR__ . '/temp/'`      | Path where user files are stored                                                           |
-| `cookie.path`     | `(string)'/'`                     | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
-| `cookie.expires`  | `(int)2147483647`                 | A timestamp when cookie expires. Default is about 20 years.                                |
-| `cookie.prefix`   | `(string)'knock'`                 | To prevent collisions with other cookies you can set your own prefix.                      |
-| `callback.login`  | `(function)function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
-| `callback.logout` | `(function)function($success) {}` | After logging out, this hook is triggered if it exists                                     |
+| Name              | Type     | Default                 | Description                                                                                |
+| ----------------- | -------- | ----------------------- | ------------------------------------------------------------------------------------------ |
+| `path.temp`       | string   | `__DIR__ . '/users/'`   | Path where temporary login data is stored                                                  |
+| `path.users`      | string   | `__DIR__ . '/temp/'`    | Path where user files are stored                                                           |
+| `cookie.path`     | string   | `'/'`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `cookie.expires`  | integer  | `2147483647`       | A timestamp when cookie expires. Default is about 20 years.                                |
+| `cookie.prefix`   | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
+| `callback.login`  | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
+| `callback.logout` | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
 
 ## Requirements
 

@@ -10,6 +10,7 @@ PHP authorization class for logging in and logging out. No form is included.
 - Plenty of options
 - Hooks triggered after login/logout
 - No dependencies
+- No database
 
 ## Quick example
 

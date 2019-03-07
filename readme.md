@@ -2,6 +2,8 @@
 
 PHP authorization class for logging in and logging out. No form is included.
 
+*Version 1.1* [Changelog](changelog.md)
+
 ## In short
 
 - Only 1 class
@@ -128,9 +130,10 @@ return [
   'path.temp' => __DIR__ . '/temp/',
   'cookie.path' => '/',
   'cookie.expires' => 2147483647,
-  'prefix' => 'knock',
+  'cookie.prefix' => 'knock',
   'callback.login' => function($success) {},
   'callback.logout' => function($success) {},
+  'delay' => rand(1000, 2000)
 ];
 ```
 
@@ -145,6 +148,7 @@ return [
 | `cookie.prefix`   | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
 | `callback.login`  | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
 | `callback.logout` | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
+| `delay`           | integer  | `rand(1000, 2000)`      | A millisecond number to delay the authorization. It will prevent bruce force attacks       |
 
 ### Callbacks
 

@@ -38,11 +38,12 @@ class KnockCore {
   }
 
   public function isLoggedIn() {
-    if(!isset($_COOKIE[$this->o('prefix')]['username'])) return;
-    if(!isset($_COOKIE[$this->o('prefix')]['hash'])) return;
+    $prefix = $this->o('cookie.prefix');
+    if(!isset($_COOKIE[$prefix]['username'])) return;
+    if(!isset($_COOKIE[$prefix]['hash'])) return;
 
-    $hash = include($this->o('path.temp') . $_COOKIE[$this->o('prefix')]['username'] . '.php');
-    $hash_cookie = $_COOKIE[$this->o('prefix')]['hash'];
+    $hash = include($this->o('path.temp') . $_COOKIE[$prefix]['username'] . '.php');
+    $hash_cookie = $_COOKIE[$prefix]['hash'];
 
     if($hash == $hash_cookie) return true;
   }

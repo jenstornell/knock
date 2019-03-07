@@ -12,6 +12,8 @@ class KnockCore {
     if($this->o('callback.login')) {
       return $this->o('callback.login')($success);
     }
+
+    return $success;
   }
 
   // Logout
@@ -21,6 +23,8 @@ class KnockCore {
     if($this->o('callback.logout')) {
       return $this->o('callback.logout')($success);
     }
+
+    return $success;
   }
 
   // Check if user is authorized with post variables

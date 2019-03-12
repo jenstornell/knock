@@ -150,7 +150,7 @@ return [
 | `cookie.hash.key`     | string   | `'hash'`                | Change this to make the cookie a bit more cryptic.                                         |
 | `cookie.path`         | string   | `'/'`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
 | `cookie.prefix`       | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
-| `cookie.secure`       | string   | `true`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `cookie.secure`       | string   | `true`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                          |
 | `callback.login`      | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
 | `callback.logout`     | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
 | `cookie.username.key` | string   | `'username'`            | Change this to make the cookie a bit more cryptic.                                         |

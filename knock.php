@@ -49,7 +49,10 @@ class KnockCore {
     if(!isset($_COOKIE[$prefix][$userkey])) return;
     if(!isset($_COOKIE[$prefix][$hashkey])) return;
 
-    $hash = include($this->o('path.temp') . $_COOKIE[$prefix][$userkey] . '.php');
+    $user_filepath = $this->o('path.temp') . $_COOKIE[$prefix][$userkey] . '.php';
+    if(!file_exists($user_filepath)) return;
+
+    $hash = include($user_filepath);
     $hash_cookie = $_COOKIE[$prefix][$hashkey];
 
     if($hash == $hash_cookie) return true;

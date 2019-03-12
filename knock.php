@@ -74,16 +74,16 @@ class KnockCore {
   // Defaults
   private function defaults() {
     return [
+      'cookie.domain' => '',
+      'cookie.expires' => 2147483647,
+      'cookie.hash.key' => 'hash',
+      'cookie.path' => '/',
+      'cookie.prefix' => 'knock',
+      'cookie.secure' => true,
+      'cookie.username.key' => 'username',
+      'delay' => rand(1000, 2000),
       'path.users' => __DIR__ . '/users/',
       'path.temp' => __DIR__ . '/temp/',
-      'cookie.domain' => '',
-      'cookie.path' => '/',
-      'cookie.secure' => true,
-      'cookie.expires' => 2147483647,
-      'cookie.prefix' => 'knock',
-      'cookie.username.key' => 'username',
-      'cookie.hash.key' => 'hash',
-      'delay' => rand(1000, 2000),
     ];
   }
 

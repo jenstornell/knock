@@ -126,29 +126,37 @@ To use the options you need to place a `options.php` file in the root.
 
 ```php
 return [
+  'cookie.domain' => '',
+  'cookie.expires' => 2147483647,
+  'cookie.hash.key' => 'hash',
+  'cookie.path' => '/',
+  'cookie.prefix' => 'knock',
+  'cookie.secure' => true,
+  'cookie.username.key' => 'username',
+  'delay' => rand(1000, 2000),
   'path.users' => __DIR__ . '/users/',
   'path.temp' => __DIR__ . '/temp/',
-  'cookie.path' => '/',
-  'cookie.expires' => 2147483647,
-  'cookie.prefix' => 'knock',
   'callback.login' => function($success) {},
   'callback.logout' => function($success) {},
-  'delay' => rand(1000, 2000)
 ];
 ```
 
 ### Explained
 
-| Name              | Type     | Default                 | Description                                                                                |
-| ----------------- | -------- | ----------------------- | ------------------------------------------------------------------------------------------ |
-| `path.temp`       | string   | `__DIR__ . '/users/'`   | Path where temporary login data is stored                                                  |
-| `path.users`      | string   | `__DIR__ . '/temp/'`    | Path where user files are stored                                                           |
-| `cookie.path`     | string   | `'/'`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
-| `cookie.expires`  | integer  | `2147483647`            | A timestamp when cookie expires. Default is about 20 years.                                |
-| `cookie.prefix`   | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
-| `callback.login`  | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
-| `callback.logout` | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
-| `delay`           | integer  | `rand(1000, 2000)`      | A millisecond number to delay the authorization. It will prevent bruce force attacks       |
+| Name                  | Type     | Default                 | Description                                                                                |
+| --------------------- | -------- | ----------------------- | ------------------------------------------------------------------------------------------ |
+| `cookie.domain`       | string   | `''`                    | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `cookie.expires`      | integer  | `2147483647`            | A timestamp when cookie expires. Default is about 20 years.                                |
+| `cookie.hash.key`     | string   | `'hash'`                | Change this to make the cookie a bit more cryptic.                                         |
+| `cookie.path`         | string   | `'/'`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `cookie.prefix`       | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
+| `cookie.secure`       | string   | `true`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `callback.login`      | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
+| `callback.logout`     | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
+| `cookie.username.key` | string   | `'username'`            | Change this to make the cookie a bit more cryptic.                                         |
+| `delay`               | integer  | `rand(1000, 2000)`      | A millisecond number to delay the authorization. It will prevent bruce force attacks       |
+| `path.temp`           | string   | `__DIR__ . '/users/'`   | Path where temporary login data is stored                                                  |
+| `path.users`          | string   | `__DIR__ . '/temp/'`    | Path where user files are stored                                                           |
 
 ### Callbacks
 

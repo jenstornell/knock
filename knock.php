@@ -43,11 +43,14 @@ class KnockCore {
 
   public function isLoggedIn() {
     $prefix = $this->o('cookie.prefix');
-    if(!isset($_COOKIE[$prefix]['username'])) return;
-    if(!isset($_COOKIE[$prefix]['hash'])) return;
+    $userkey = $this->o('cookie.username.key');
+    $hashkey = $this->o('cookie.hash.key');
 
-    $hash = include($this->o('path.temp') . $_COOKIE[$prefix]['username'] . '.php');
-    $hash_cookie = $_COOKIE[$prefix]['hash'];
+    if(!isset($_COOKIE[$prefix][$userkey])) return;
+    if(!isset($_COOKIE[$prefix][$hashkey])) return;
+
+    $hash = include($this->o('path.temp') . $_COOKIE[$prefix][$userkey] . '.php');
+    $hash_cookie = $_COOKIE[$prefix][$hashkey];
 
     if($hash == $hash_cookie) return true;
   }
@@ -73,9 +76,13 @@ class KnockCore {
     return [
       'path.users' => __DIR__ . '/users/',
       'path.temp' => __DIR__ . '/temp/',
+      'cookie.domain' => '',
       'cookie.path' => '/',
+      'cookie.secure' => true,
       'cookie.expires' => 2147483647,
       'cookie.prefix' => 'knock',
+      'cookie.username.key' => 'username',
+      'cookie.hash.key' => 'hash',
       'delay' => rand(1000, 2000),
     ];
   }
@@ -100,23 +107,26 @@ class KnockCore {
 
   // Delete cookies
   private function deleteCookies() {
-    if(!$this->setCookie('[username]', '', 0)) return;
-    if(!$this->setCookie('[hash]', '', 0)) return;
+    if(!$this->setCookie('[' . $this->o('cookie.username.key') . ']', '', 0)) return;
+    if(!$this->setCookie('[' . $this->o('cookie.hash.key') . ']', '', 0)) return;
 
     return true;
   }
 
   // Write cookie on login
   private function writeCookie($hash) {
-    if(!$this->setCookie('[username]', $_POST['username'])) return;
-    if(!$this->setCookie('[hash]', $hash)) return;
+    if(!$this->setCookie('[' . $this->o('cookie.username.key') . ']', $_POST['username'])) return;
+    if(!$this->setCookie('[' . $this->o('cookie.hash.key') . ']', $hash)) return;
 
     return true;
   }
 
   private function setCookie($key, $value, $expires = null) {
     $expires = ($expires === null) ? $this->o('cookie.expires') : $expires;
-    return setcookie($this->o('cookie.prefix') . $key, $value, $expires, $this->o('cookie.path'));
+    $domain = $this->o('cookie.domain');
+    $secure = $this->o('cookie.secure');
+
+    return setcookie($this->o('cookie.prefix') . $key, $value, $expires, $this->o('cookie.path'), $domain, $secure, true);
   }
 
   // Write temp file to disc

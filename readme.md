@@ -2,7 +2,7 @@
 
 PHP authorization class for logging in and logging out. No form is included.
 
-*Version 1.2* [Changelog](changelog.md)
+*Version 1.3* [Changelog](changelog.md)
 
 ## In short
 
@@ -138,6 +138,7 @@ return [
   'path.temp' => __DIR__ . '/temp/',
   'callback.login' => function($success) {},
   'callback.logout' => function($success) {},
+  'salt' => '',
 ];
 ```
 
@@ -150,13 +151,14 @@ return [
 | `cookie.hash.key`     | string   | `'hash'`                | Change this to make the cookie a bit more cryptic.                                         |
 | `cookie.path`         | string   | `'/'`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
 | `cookie.prefix`       | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
-| `cookie.secure`       | string   | `true`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                          |
+| `cookie.secure`       | string   | `true`                  | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
 | `callback.login`      | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
 | `callback.logout`     | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
 | `cookie.username.key` | string   | `'username'`            | Change this to make the cookie a bit more cryptic.                                         |
 | `delay`               | integer  | `rand(1000, 2000)`      | A millisecond number to delay the authorization. It will prevent bruce force attacks       |
 | `path.temp`           | string   | `__DIR__ . '/users/'`   | Path where temporary login data is stored                                                  |
 | `path.users`          | string   | `__DIR__ . '/temp/'`    | Path where user files are stored                                                           |
+| `salt`                | string   | `''`                    | A random string that will be added to the temp file. It will make it a bit harder to hack  |
 
 ### Callbacks
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3
+
+- Added `salt` option.
+
 ## 1.2
 
 - Force cookie to `httponly` is now `true`.

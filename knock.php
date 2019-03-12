@@ -55,6 +55,8 @@ class KnockCore {
     $hash = include($user_filepath);
     $hash_cookie = $_COOKIE[$prefix][$hashkey];
 
+    $hash_cookie = hash('sha256', $hash_cookie . $this->o('salt'));
+
     if($hash == $hash_cookie) return true;
   }
 
@@ -87,6 +89,7 @@ class KnockCore {
       'delay' => rand(1000, 2000),
       'path.users' => __DIR__ . '/users/',
       'path.temp' => __DIR__ . '/temp/',
+      'salt' => '',
     ];
   }
 
@@ -137,7 +140,14 @@ class KnockCore {
     if(!file_exists($this->o('path.temp'))) {
       if(!mkdir($this->o('path.temp'))) return;
     }
-    return file_put_contents($this->o('path.temp') . $_POST['username'] . '.php', "<?php return '" . $hash . "';");
+
+    $salt = $this->o('salt');
+    $path = $this->o('path.temp') . $_POST['username'] . '.php';
+
+    $hash = hash('sha256', $hash . $salt);
+    $content = "<?php return '" . $hash . "';";
+
+    return file_put_contents($path, $content);
   }
 }
 

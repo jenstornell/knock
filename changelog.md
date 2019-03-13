@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.5
+
+- Added expires cookie to be able to see when the cookie expires.
+- Added cookie option `cookie.expires.key` to make the expires cookie a bit more cryptic.
+- Added cookie option `cookie.refresh` in case `knock::keepAlive()` is used.
+- Added function `knock::keepAlive()` to trigger the cookies to refreh itself, if the cookie time is close to expire.
+- Added function `knock::refresh()` to trigger the cookies to refresh.
+- Added function `knock::getCookieExpires()` to get the cookies expire timestamp.
+- Updated all tests.
+
+## 1.4
+
+- Added post option `post.username.key` and `post.password.key` to make it less guess fiendly.
+- Changed the default cookie expire time from 20 years to 2 days.
+
 ## 1.3
 
 - Added `salt` option.

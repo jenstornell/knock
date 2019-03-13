@@ -2,7 +2,7 @@
 
 PHP authorization class for logging in and logging out. No form is included.
 
-*Version 1.3* [Changelog](changelog.md)
+*Version 1.5* [Changelog](changelog.md)
 
 ## In short
 
@@ -111,6 +111,30 @@ You can use this function to see if the user is logged in. It will check if the 
 
 ***Be aware: This function does not work until you refresh the page, or load another page after logging in. That's how `$_COOKIE` works.***
 
+### knock::refresh()
+
+You can use this function to refresh the cookie. It will then create a new hash and expire timestamp. To be able to refresh, it's required to be logged in.
+
+```php
+knock::refresh();
+```
+
+### knock::keepAlive()
+
+This function is similar to `knock::refresh()`. The difference is that this function will only refresh if the cookie is close to the expire time. How close depends on what you set in the option `cookie.refresh`. The default is 15 minutes before the cookie expires.
+
+```php
+knock::refresh();
+```
+
+### knock::getCookieExpires()
+
+Get the cookie expires timestamp.
+
+```php
+echo knock::getCookieExpires();
+```
+
 ```php
 <?php
 if(!knock::isLoggedIn()) die('You are not allowed to view this page.');
@@ -126,18 +150,22 @@ To use the options you need to place a `options.php` file in the root.
 
 ```php
 return [
+  'callback.login' => function($success) {},
+  'callback.logout' => function($success) {},
   'cookie.domain' => '',
-  'cookie.expires' => 2147483647,
+  'cookie.expires' => strtotime('+2 days'),
+  'cookie.expires.key' => 'expires',
   'cookie.hash.key' => 'hash',
   'cookie.path' => '/',
   'cookie.prefix' => 'knock',
+  'cookie.refresh' => 15,
   'cookie.secure' => true,
   'cookie.username.key' => 'username',
   'delay' => rand(1000, 2000),
   'path.users' => __DIR__ . '/users/',
   'path.temp' => __DIR__ . '/temp/',
-  'callback.login' => function($success) {},
-  'callback.logout' => function($success) {},
+  'post.password.key' => 'password',
+  'post.username.key' => 'username',
   'salt' => '',
 ];
 ```
@@ -147,10 +175,12 @@ return [
 | Name                  | Type     | Default                 | Description                                                                                |
 | --------------------- | -------- | ----------------------- | ------------------------------------------------------------------------------------------ |
 | `cookie.domain`       | string   | `''`                    | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
-| `cookie.expires`      | integer  | `2147483647`            | A timestamp when cookie expires. Default is about 20 years.                                |
+| `cookie.expires`      | integer  | `strtotime('+2 days')`  | A timestamp when cookie expires. Default is about 20 years.                                |
+| `cookie.expires.key`  | string   | `'expires'`             | Change this to make the cookie a bit more cryptic.                                         |
 | `cookie.hash.key`     | string   | `'hash'`                | Change this to make the cookie a bit more cryptic.                                         |
 | `cookie.path`         | string   | `'/'`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
 | `cookie.prefix`       | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
+| `cookie.refresh`      | string   | `15`                    | When using `knock::keepAlive()` this value is used to decide when to refresh the cookie.   |
 | `cookie.secure`       | string   | `true`                  | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
 | `callback.login`      | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
 | `callback.logout`     | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
@@ -158,6 +188,8 @@ return [
 | `delay`               | integer  | `rand(1000, 2000)`      | A millisecond number to delay the authorization. It will prevent bruce force attacks       |
 | `path.temp`           | string   | `__DIR__ . '/users/'`   | Path where temporary login data is stored                                                  |
 | `path.users`          | string   | `__DIR__ . '/temp/'`    | Path where user files are stored                                                           |
+| `post.password.key`   | string   | `'password'`            | Change this to make the post a bit more cryptic.                                           |
+| `post.username.key`   | string   | `'username'`            | Change this to make the post a bit more cryptic.                                           |
 | `salt`                | string   | `''`                    | A random string that will be added to the temp file. It will make it a bit harder to hack  |
 
 ### Callbacks

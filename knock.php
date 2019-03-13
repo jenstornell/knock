@@ -8,8 +8,9 @@ class KnockCore {
   // Login with post variables
   public function login() {
     $success = null;
+    usleep($this->o('delay') * 1000);
+    
     if($this->isAuthorized()) {
-      usleep($this->o('delay') * 1000);
       $userkey = $this->o('post.username.key');
       $success = $this->loginUser($_POST[$userkey]);
     }
@@ -120,7 +121,7 @@ class KnockCore {
       'cookie.refresh' => 115,
       'cookie.secure' => true,
       'cookie.username.key' => 'username',
-      'delay' => rand(1000, 2000),
+      'delay' => 500,
       'path.users' => __DIR__ . '/users/',
       'path.temp' => __DIR__ . '/temp/',
       'post.password.key' => 'password',

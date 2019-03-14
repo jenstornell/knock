@@ -9,8 +9,9 @@ PHP authorization class for logging in and logging out. No form is included.
 - Only 1 class
 - A really small class
 - Persistent cookie
+- Callback support
+- Whitelist of IPs
 - Plenty of options
-- Hooks triggered after login/logout
 - No dependencies
 - No database
 
@@ -124,7 +125,7 @@ knock::refresh();
 This function is similar to `knock::refresh()`. The difference is that this function will only refresh if the cookie is close to the expire time. How close depends on what you set in the option `cookie.refresh`. The default is 15 minutes before the cookie expires.
 
 ```php
-knock::refresh();
+knock::keepAlive();
 ```
 
 ### knock::getCookieExpires()
@@ -155,7 +156,6 @@ return [
   'cookie_prefix' => 'knock',
   'cookie_refresh' => 15,
   'login_delay' => 500,
-  'login_attempts' => 5,
   'key_cookie_expires' => 'expires',
   'key_cookie_hash' => 'hash',
   'key_cookie_username' => 'username',

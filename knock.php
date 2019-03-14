@@ -56,8 +56,15 @@ class KnockCore {
   }
 
   // Logout user
-  private function logoutUser() {
-    return $this->deleteCookies();
+  private function logoutUser($username) {
+    $path = $this->path_temp . $username . '.php';
+
+    if(file_exists($path)) {
+      if(!unlink($path)) return;
+    }
+    if(!$this->deleteCookies()) return;
+
+    return true;
   }
 
   // Delete cookies
@@ -139,7 +146,8 @@ class KnockCore {
 
   // Logout
   public function logout() {
-    $success = $this->logoutUser();
+    $username = (isset($_COOKIE[$this->cookie_prefix][$this->key_cookie_username])) ? $_COOKIE[$this->cookie_prefix][$this->key_cookie_username] : null;
+    $success = $this->logoutUser($username);
     return ($this->callback_logout)($success);
   }
 
@@ -161,8 +169,9 @@ class KnockCore {
   public function isLoggedIn() {
     $cookie = $_COOKIE[$this->cookie_prefix];
 
-    if(!isset($cookie[$this->key_cookie_username])) return;
+    if(!isset($cookie[$this->key_cookie_expires])) return;
     if(!isset($cookie[$this->key_cookie_hash])) return;
+    if(!isset($cookie[$this->key_cookie_username])) return;
 
     $user_filepath = $this->path_temp . $cookie[$this->key_cookie_username] . '.php';
     if(!file_exists($user_filepath)) return;

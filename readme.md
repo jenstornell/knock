@@ -200,6 +200,20 @@ return [
 | `setcookie_secure`    | string   | `false`                                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
 | `whitelist`           | array    | `[]`                                      | Allwed IP numbers. If not set, all are allowed. Ending wildcard `*` supported.             |                                                        |
 
+## Security headers
+
+Make sure to use security headers on pages where you call Knock.
+
+```php
+header("X-Frame-Options: sameorigin"); // Prevent iframe access
+header("X-XSS-Protection: 1; mode=block"); // XSS protection
+header("X-Content-Type-Options: nosniff"); // Require correct MIME type for CSS and JS
+header("Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';");
+header("Referrer-Policy: no-referrer");
+```
+
+**Source:** https://zinoui.com/blog/security-http-headers
+
 ## Generate strong passwords
 
 The probably best service out there to generate passwords is https://www.expressvpn.com/password-generator.

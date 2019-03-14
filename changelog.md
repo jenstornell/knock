@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6
+
+- Rewritten codebase.
+- All option keys has changed. See docs.
+- Most default option values has been changed. See docs.
+- Added `algorithm`, `whitelist` and `setcookie_httponly` options.
+
 ## 1.5
 
 - Added expires cookie to be able to see when the cookie expires.

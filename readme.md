@@ -2,7 +2,7 @@
 
 PHP authorization class for logging in and logging out. No form is included.
 
-*Version 1.5* [Changelog](changelog.md)
+*Version 1.6* [Changelog](changelog.md)
 
 ## In short
 
@@ -150,64 +150,59 @@ To use the options you need to place a `options.php` file in the root.
 
 ```php
 return [
-  'callback.login' => function($success) {},
-  'callback.logout' => function($success) {},
-  'cookie.domain' => '',
-  'cookie.expires' => strtotime('+2 days'),
-  'cookie.expires.key' => 'expires',
-  'cookie.hash.key' => 'hash',
-  'cookie.path' => '/',
-  'cookie.prefix' => 'knock',
-  'cookie.refresh' => 15,
-  'cookie.secure' => true,
-  'cookie.username.key' => 'username',
-  'delay' => rand(1000, 2000),
-  'path.users' => __DIR__ . '/users/',
-  'path.temp' => __DIR__ . '/temp/',
-  'post.password.key' => 'password',
-  'post.username.key' => 'username',
+  'callback_login' => function($success) { return $success; },
+  'callback_logout' => function($success) { return $success; },
+  'cookie_prefix' => 'knock',
+  'cookie_refresh' => 15,
+  'login_delay' => 500,
+  'login_attempts' => 5,
+  'key_cookie_expires' => 'expires',
+  'key_cookie_hash' => 'hash',
+  'key_cookie_username' => 'username',
+  'key_post_password' => 'password',
+  'key_post_username' => 'username',
+  'path_temp' => __DIR__ . '/temp/',
+  'path_users' => __DIR__ . '/users/',
   'salt' => '',
+  'setcookie_domain' => '',
+  'setcookie_expires' => 0,
+  'setcookie_httponly' => false,
+  'setcookie_path' => '',
+  'setcookie_secure' => false,
+  'whitelist' => [],
 ];
 ```
 
 ### Explained
 
-| Name                  | Type     | Default                 | Description                                                                                |
-| --------------------- | -------- | ----------------------- | ------------------------------------------------------------------------------------------ |
-| `cookie.domain`       | string   | `''`                    | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
-| `cookie.expires`      | integer  | `strtotime('+2 days')`  | A timestamp when cookie expires. Default is about 20 years.                                |
-| `cookie.expires.key`  | string   | `'expires'`             | Change this to make the cookie a bit more cryptic.                                         |
-| `cookie.hash.key`     | string   | `'hash'`                | Change this to make the cookie a bit more cryptic.                                         |
-| `cookie.path`         | string   | `'/'`                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
-| `cookie.prefix`       | string   | `'knock'`               | To prevent collisions with other cookies you can set your own prefix.                      |
-| `cookie.refresh`      | string   | `15`                    | When using `knock::keepAlive()` this value is used to decide when to refresh the cookie.   |
-| `cookie.secure`       | string   | `true`                  | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
-| `callback.login`      | function | `function($success) {}` | After a login attempt, this hook is triggered if it exists                                 |
-| `callback.logout`     | function | `function($success) {}` | After logging out, this hook is triggered if it exists                                     |
-| `cookie.username.key` | string   | `'username'`            | Change this to make the cookie a bit more cryptic.                                         |
-| `delay`               | integer  | `rand(1000, 2000)`      | A millisecond number to delay the authorization. It will prevent bruce force attacks       |
-| `path.temp`           | string   | `__DIR__ . '/users/'`   | Path where temporary login data is stored                                                  |
-| `path.users`          | string   | `__DIR__ . '/temp/'`    | Path where user files are stored                                                           |
-| `post.password.key`   | string   | `'password'`            | Change this to make the post a bit more cryptic.                                           |
-| `post.username.key`   | string   | `'username'`            | Change this to make the post a bit more cryptic.                                           |
-| `salt`                | string   | `''`                    | A random string that will be added to the temp file. It will make it a bit harder to hack  |
+<!--| `login_attempts`      | integer  | `5`                                       | Not yet implemented                                                                        |-->
 
-### Callbacks
+| Name                  | Type     | Default                                   | Description                                                                                |
+| --------------------- | -------- | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `algorithm`           | string   | `'sha256'`                                | The algorithm used to create hashes                                                        |
+| `callback_login`      | function | `function($success) { return $success; }` | After a login attempt, this hook is triggered if it exists                                 |
+| `callback_logout`     | function | `function($success) { return $success; }` | After logging out, this hook is triggered if it exists                                     |
+| `cookie_prefix`       | string   | `'knock'`                                 | To prevent collisions with other cookies you can set your own prefix.                      |
+| `cookie_refresh`      | string   | `15`                                      | When using `knock::keepAlive()` this value is used to decide when to refresh the cookie.   |
+| `login_delay`         | integer  | `500`                                     | A millisecond number to delay the authorization. It will prevent bruce force attacks       |
+| `key_cookie_expires`  | string   | `'expires'`                               | Change this to make the cookie a bit more cryptic.                                         |
+| `key_cookie_hash`     | string   | `'hash'`                                  | Change this to make the cookie a bit more cryptic.                                         |
+| `key_cookie_username` | string   | `'username'`                              | Change this to make the cookie a bit more cryptic.                                         |
+| `key_post_password`   | string   | `'password'`                              | Change this to make the post a bit more cryptic.                                           |
+| `key_post_username`   | string   | `'username'`                              | Change this to make the post a bit more cryptic.                                           |
+| `path_temp`           | string   | `__DIR__ . '/users/'`                     | Path where temporary login data is stored                                                  |
+| `path_users`          | string   | `__DIR__ . '/temp/'`                      | Path where user files are stored                                                           |
+| `salt`                | string   | `''`                                      | A random string that will be added to the temp file. It will make it a bit harder to hack  |
+| `setcookie_domain`    | string   | `''`                                      | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `setcookie_expires`   | integer  | `0`                                       | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `setcookie_httponly`  | boolean  | `false`                                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `setcookie_path`      | string   | `''`                                      | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `setcookie_secure`    | string   | `false`                                   | See [setcookie](http://php.net/manual/en/function.setcookie.php)                           |
+| `whitelist`           | array    | `[]`                                      | Allwed IP numbers. If not set, all are allowed. Ending wildcard `*` supported.             |                                                        |
 
-The callbacks are just options. The differece is that they work like functions, triggered by login or logout. In the `options.php` file you can do like below.
+## Generate strong passwords
 
-```php
-return [
-  'callback.login' => function($success) {
-    if($success) {
-      header('Location: https://example.com/admin');
-    } else {
-      header('Location: https://example.com/error');
-    }
-    die;
-  }
-];
-```
+The probably best service out there to generate passwords is https://www.expressvpn.com/password-generator.
 
 ## Requirements
 

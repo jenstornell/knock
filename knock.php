@@ -1,133 +1,48 @@
 <?php
 class KnockCore {
+
   // Set options
   public function __construct() {
     $this->options();
   }
 
-  // Login with post variables
-  public function login() {
-    $success = null;
-    usleep($this->o('delay') * 1000);
-    
-    if($this->isAuthorized()) {
-      $userkey = $this->o('post.username.key');
-      $success = $this->loginUser($_POST[$userkey]);
-    }
+  ## PRIVATE
 
-    if($this->o('callback.login')) {
-      return $this->o('callback.login')($success);
-    }
-
-    return $success;
-  }
-
-  // Logout
-  public function logout() {
-    $success = $this->logoutUser();
-
-    if($this->o('callback.logout')) {
-      return $this->o('callback.logout')($success);
-    }
-
-    return $success;
-  }
-
-  // Check if user is authorized with post variables
-  public function isAuthorized() {
-    $userkey = $this->o('post.username.key');
-    $passkey = $this->o('post.password.key');
-
-    if(!isset($_POST[$userkey])) return;
-    if(!isset($_POST[$passkey])) return;
-
-    $user_filepath = $this->o('path.users') . $_POST[$userkey] . '.php';
-    if(!file_exists($user_filepath)) return;
-    
-    $password = include($user_filepath);
-    $password_post = hash('sha256', $_POST[$passkey]);
-
-    if($password == $password_post) return true;
-  }
-
-  // Check if user is logged in with cookie
-  public function isLoggedIn() {
-    $prefix = $this->o('cookie.prefix');
-    $userkey = $this->o('cookie.username.key');
-    $hashkey = $this->o('cookie.hash.key');
-
-    if(!isset($_COOKIE[$prefix][$userkey])) return;
-    if(!isset($_COOKIE[$prefix][$hashkey])) return;
-
-    $user_filepath = $this->o('path.temp') . $_COOKIE[$prefix][$userkey] . '.php';
-    if(!file_exists($user_filepath)) return;
-
-    $hash = include($user_filepath);
-    $hash_cookie = $_COOKIE[$prefix][$hashkey];
-
-    $hash_cookie = hash('sha256', $hash_cookie . $this->o('salt'));
-
-    if($hash == $hash_cookie) return true;
-  }
-
-  // Get the cookies expire timestamp
-  public function getCookieExpires() {
-    return $_COOKIE[$this->o('cookie.prefix')][$this->o('cookie.expires.key')];
-  }
-
-  // Refresh the cookies if the cookies will soon expire
-  public function keepAlive() {
-    $minutes = round(($this->getCookieExpires()-time())/60);
-    $diff = $minutes - $this->o('cookie.refresh');
-    if($diff < 0) {
-      return $this->refresh();
-    }
-    return true;
-  }
-
-  // Refresh the cookies, creates new hash and expire timestamp
-  public function refresh() {
-    if($this->isLoggedIn()) {
-      return $this->loginUser($_COOKIE[$this->o('cookie.prefix')][$this->o('cookie.username.key')]);
-    }
-    return true;
+  // Defaults
+  private function defaults() {
+    return [
+      'algorithm' => 'sha256',
+      'callback_login' => function($success) { return $success; },
+      'callback_logout' => function($success) { return $success; },
+      'cookie_prefix' => 'knock',
+      'cookie_refresh' => 15, // Bad key name
+      'login_delay' => 500,
+      'login_attempts' => 5,
+      'key_cookie_expires' => 'expires',
+      'key_cookie_hash' => 'hash',
+      'key_cookie_username' => 'username',
+      'key_post_password' => 'password',
+      'key_post_username' => 'username',
+      'path_temp' => __DIR__ . '/temp/',
+      'path_users' => __DIR__ . '/users/',
+      'salt' => '',
+      'setcookie_domain' => '',
+      'setcookie_expires' => 0,
+      'setcookie_httponly' => false,
+      'setcookie_path' => '',
+      'setcookie_secure' => false,
+      'whitelist' => [],
+    ];
   }
 
   // Set options
   private function options() {
     $path = __DIR__ . '/options.php';
-    
-    if(file_exists($path)) {
-      $this->options = array_merge($this->defaults(), include($path));
-    } else {
-      $this->options = $this->defaults();
+    $array = (file_exists($path)) ? array_merge($this->defaults(), include($path)) : $this->defaults();
+
+    foreach($array as $key => $value) {
+      $this->{$key} = $value;
     }
-  }
-
-  // Option helper
-  private function o($key) {
-    return (isset($this->options[$key])) ? $this->options[$key] : null;
-  }
-
-  // Defaults
-  private function defaults() {
-    return [
-      'cookie.domain' => '',
-      'cookie.expires' => strtotime('+2 days'),
-      'cookie.expires.key' => 'expires',
-      'cookie.hash.key' => 'hash',
-      'cookie.path' => '/',
-      'cookie.prefix' => 'knock',
-      'cookie.refresh' => 115,
-      'cookie.secure' => true,
-      'cookie.username.key' => 'username',
-      'delay' => 500,
-      'path.users' => __DIR__ . '/users/',
-      'path.temp' => __DIR__ . '/temp/',
-      'post.password.key' => 'password',
-      'post.username.key' => 'username',
-      'salt' => '',
-    ];
   }
 
   // Login user
@@ -147,46 +62,137 @@ class KnockCore {
 
   // Delete cookies
   private function deleteCookies() {
-    if(!$this->setCookie('[' . $this->o('cookie.username.key') . ']', '', 0)) return;
-    if(!$this->setCookie('[' . $this->o('cookie.hash.key') . ']', '', 0)) return;
-    if(!$this->setCookie('[' . $this->o('cookie.expires.key') . ']', '', 0)) return;
+    if(!$this->setCookie('[' . $this->key_cookie_username . ']', '', 0)) return;
+    if(!$this->setCookie('[' . $this->key_cookie_hash . ']', '', 0)) return;
+    if(!$this->setCookie('[' . $this->key_cookie_expires . ']', '', 0)) return;
 
     return true;
   }
 
   // Write cookie on login
   private function writeCookie($hash, $username) {
-    $userkey = $this->o('post.username.key');
-    if(!$this->setCookie('[' . $this->o('cookie.username.key') . ']', $username)) return;
-    if(!$this->setCookie('[' . $this->o('cookie.hash.key') . ']', $hash)) return;
-    if(!$this->setCookie('[' . $this->o('cookie.expires.key') . ']', $this->o('cookie.expires'))) return;
+    if(!$this->setCookie('[' . $this->key_cookie_username . ']', $username)) return;
+    if(!$this->setCookie('[' . $this->key_cookie_hash . ']', $hash)) return;
+    if(!$this->setCookie('[' . $this->key_cookie_expires . ']', $this->setcookie_expires)) return;
 
     return true;
   }
 
   // Set cookie
   private function setCookie($key, $value, $expires = null) {
-    $expires = ($expires === null) ? $this->o('cookie.expires') : $expires;
-    $domain = $this->o('cookie.domain');
-    $secure = $this->o('cookie.secure');
-
-    return setcookie($this->o('cookie.prefix') . $key, $value, $expires, $this->o('cookie.path'), $domain, $secure, true);
+    $expires = ($expires === null) ? $this->setcookie_expires : $expires;
+    return setcookie(
+      $this->cookie_prefix . $key,
+      $value,
+      $expires,
+      $this->setcookie_path,
+      $this->setcookie_domain,
+      $this->setcookie_secure,
+      $this->setcookie_httponly
+    );
   }
 
   // Write temp file to disc
   private function writeFile($hash, $username) {
-    if(!file_exists($this->o('path.temp'))) {
-      if(!mkdir($this->o('path.temp'))) return;
+    if(!file_exists($this->path_temp)) {
+      if(!mkdir($this->path_temp)) return;
     }
 
-    $salt = $this->o('salt');
-    $userkey = $this->o('post.username.key');
-    $path = $this->o('path.temp') . $username . '.php';
+    $path = $this->path_temp . $username . '.php';
 
-    $hash = hash('sha256', $hash . $salt);
+    $hash = hash($this->algorithm, $hash . $this->salt);
     $content = "<?php return '" . $hash . "';";
 
     return file_put_contents($path, $content);
+  }
+
+  // Check if IP is allowed
+  private function ipAllowed() {
+    if(empty($this->whitelist)) return true;
+
+    foreach($this->whitelist as $item) {
+      if(substr($item, -1) === '*') {
+        $starts_with = substr($item, 0, -1);
+        if(strpos($_SERVER['REMOTE_ADDR'], $starts_with) === 0) {
+          return true;
+        }
+      } elseif($item === $_SERVER['REMOTE_ADDR']) {
+         return true;
+      }
+    }
+  }
+
+  ## PUBLIC
+
+  // Login with post variables
+  public function login() {
+    $success = null;
+
+    usleep($this->login_delay * 1000);
+    $ip_allowed = $this->ipAllowed();
+    
+    if($ip_allowed && $this->isAuthorized()) {
+      $success = $this->loginUser($_POST[$this->key_post_username]);
+    }
+    return ($this->callback_login)($success);
+  }
+
+  // Logout
+  public function logout() {
+    $success = $this->logoutUser();
+    return ($this->callback_logout)($success);
+  }
+
+  // Check if user is authorized with post variables
+  public function isAuthorized() {
+    if(!isset($_POST[$this->key_post_username])) return;
+    if(!isset($_POST[$this->key_post_password])) return;
+
+    $user_filepath = $this->path_users . $_POST[$this->key_post_username] . '.php';
+    if(!file_exists($user_filepath)) return;
+    
+    $password = include($user_filepath);
+    $password_post = hash($this->algorithm, $_POST[$this->key_post_password]);
+
+    if($password == $password_post) return true;
+  }
+
+  // Check if user is logged in with cookie
+  public function isLoggedIn() {
+    $cookie = $_COOKIE[$this->cookie_prefix];
+
+    if(!isset($cookie[$this->key_cookie_username])) return;
+    if(!isset($cookie[$this->key_cookie_hash])) return;
+
+    $user_filepath = $this->path_temp . $cookie[$this->key_cookie_username] . '.php';
+    if(!file_exists($user_filepath)) return;
+
+    $hash = include($user_filepath);
+    $hash_cookie = $cookie[$this->key_cookie_hash];
+
+    $hash_cookie = hash($this->algorithm, $hash_cookie . $this->salt);
+
+    if($hash == $hash_cookie) return true;
+  }
+
+  // Get the cookies expire timestamp
+  public function getCookieExpires() {
+    return $_COOKIE[$this->cookie_prefix][$this->key_cookie_expires];
+  }
+
+  // Refresh the cookies if the cookies will soon expire
+  public function keepAlive() {
+    $minutes = round(($this->getCookieExpires()-time())/60);
+    $diff = $minutes - $this->cookie_refresh;
+    return ($diff < 0) ? $this->refresh() : true;
+  }
+
+  // Refresh the cookies, creates new hash and expire timestamp
+  public function refresh() {
+    if($this->isLoggedIn()) {
+      return $this->loginUser($_COOKIE[$this->cookie_prefix][$this->key_cookie_username]);
+    }
+    return true;
   }
 }
 

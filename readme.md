@@ -8,7 +8,6 @@ PHP authorization class for logging in and logging out. No form is included.
 
 - Only 1 class
 - Persistent cookie
-- Callback support
 - Whitelist of IPs
 - Plenty of options
 - No dependencies
@@ -73,8 +72,6 @@ To use the options you need to place a `options.php` file in the root.
 
 ```php
 return [
-  'callback_login' => function($success) { return $success; },
-  'callback_logout' => function($success) { return $success; },
   'cookie_prefix' => 'knock',
   'cookie_refresh' => 15,
   'login_delay' => 500,
@@ -102,8 +99,6 @@ return [
 | Name                  | Type     | Default                                   | Description                                                                                |
 | --------------------- | -------- | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `algorithm`           | string   | `'sha256'`                                | The algorithm used to create hashes                                                        |
-| `callback_login`      | function | `function($success) { return $success; }` | After a login attempt, this hook is triggered if it exists                                 |
-| `callback_logout`     | function | `function($success) { return $success; }` | After logging out, this hook is triggered if it exists                                     |
 | `cookie_prefix`       | string   | `'knock'`                                 | To prevent collisions with other cookies you can set your own prefix.                      |
 | `cookie_refresh`      | string   | `15`                                      | When using `knock::keepAlive()` this value is used to decide when to refresh the cookie.   |
 | `login_delay`         | integer  | `500`                                     | A millisecond number to delay the authorization. It will prevent bruce force attacks       |

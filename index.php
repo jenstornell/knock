@@ -1,7 +1,11 @@
 <?php
 include __DIR__ . '/knock.php';
 
-$_POST['username'] = 'test@example.com';
-$_POST['password'] = 'test';
+$_POST['postusername'] = 'test@example.com';
+$_POST['postpassword'] = 'test';
 
-echo knock::login();
+$knock = new Knock();
+
+print_r($knock->isAuthorized());
+
+#echo knock::login();

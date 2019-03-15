@@ -1,1 +1,3 @@
-<?php return hash('sha256', 'test');
+<?php return [
+  'password' => hash('sha256', 'test'),
+];

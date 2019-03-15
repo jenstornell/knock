@@ -4,11 +4,8 @@ include __DIR__ . '/../knock.php';
 $folder = dirname($_SERVER['PHP_SELF']);
 $link = 'http://' . $_SERVER['HTTP_HOST'] . $folder . '/done.php';
 
-if(knock::isLoggedIn()) {
+$knock = new Knock();
+
+if($knock->isLoggedIn()) {
   header("Location: " . $link);
 }
-
-/*if($_GET['hash'] != $_COOKIE['knock']['hashabc'] && $_GET['expires'] != $_COOKIE['knock']['expires']) {
-  header("Location: " . $link);
-  die;
-}*/

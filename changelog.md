@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7
+
+- Added "Hacker challange" to readme.
+- Changed how user files work. Now it's an array instead of a string. Will be useful in the future to be able to add roles etc.
+- Added better error handling.
+- Changed syntax and skipped static methods.
+
 ## 1.6
 
 - Rewritten codebase.

@@ -2,41 +2,17 @@
 
 PHP authorization class for logging in and logging out. No form is included.
 
-*Version 1.6* [Changelog](changelog.md)
+*Version 1.7* [Changelog](changelog.md)
 
 ## In short
 
 - Only 1 class
-- A really small class
 - Persistent cookie
 - Callback support
 - Whitelist of IPs
 - Plenty of options
 - No dependencies
 - No database
-
-## Quick example
-
-### Form page
-
-```php
-<?php
-include __DIR__ . '/knock.php';
-
-$_POST['username'] = 'test@example.com';
-$_POST['password'] = 'test';
-
-knock::login();
-```
-
-### Destination page
-
-```php
-<?php
-if(!knock::isLoggedIn()) die('You are not allowed to view this page.');
-
-echo 'Welcome user!';
-```
 
 ## Usage
 
@@ -51,97 +27,43 @@ The folder structure may look like below where filename should be `[username].ph
 
 #### Inside the user file
 
-Inside the user file you return the password. To use the password `test` you need to hash it with a tool like [SHA256 Hash Generator](https://passwordsgenerator.net/sha256-hash-generator/).
+- Inside the user file you return an array including the password.
+- To use the password `test` you need to hash it with a tool like [SHA256 Hash Generator](https://passwordsgenerator.net/sha256-hash-generator/).
+- *You can also use `hash('sha256', 'test')` as the password, but that is not recommended. Use it for testing purposes only!*
 
 ```php
-<?php return '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08';
-```
-
-*You can also use `<?php return hash('sha256', 'test');`, but it's not recommended. Use it for testing purpose only!*
-
-### Initialize class
-
-To be able to call any method, you first need to load the class.
-
-```php
-include __DIR__ . '/knock.php';
+<?php return [
+  'password' => '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
+];
 ```
 
 ## Methods
 
-For any method to work, you need to initialize the class like above.
-
-### knock::login()
-
-You can use this function to login a user. It will check if the user `$_POST` password matches the user file password. If it matches it will write a hash to a temp file and set a `$_COOKIE`.
+All methods work simliar to below.
 
 ```php
-<?php
+include __DIR__ . '/knock.php';
+
 $_POST['username'] = 'test@example.com';
 $_POST['password'] = 'test';
 
-knock::login();
-```
-
-### knock::logout()
-
-You can use this function to logout a user. It will delte the `$_COOKIE` as long as the current options has not changed.
-
-```php
-<?php
-knock::logout();
-```
-
-### knock::isAuthorized()
-
-You can use this function to see if the user that is trying to login is authorized. It will check if the user `$_POST` password matches the user file password. It will return `true` or `false`.
-
-```php
-<?php
-$_POST['username'] = 'test@example.com';
-$_POST['password'] = 'test';
-
-if(knock::isAuthorized()) {
-  echo 'You are authorized';
+$knock = new Knock();
+if($knock->login()) {
+  echo 'You are logged in';
+} else {
+  print_r($knock->results); // ['success' => false, 'error' => 'error_message']
 }
 ```
 
-### knock::isLoggedIn()
-
-You can use this function to see if the user is logged in. It will check if the user `$_COOKIE` hash matches the temp file hash. It will return `true` or `false`.
-
-***Be aware: This function does not work until you refresh the page, or load another page after logging in. That's how `$_COOKIE` works.***
-
-### knock::refresh()
-
-You can use this function to refresh the cookie. It will then create a new hash and expire timestamp. To be able to refresh, it's required to be logged in.
-
-```php
-knock::refresh();
-```
-
-### knock::keepAlive()
-
-This function is similar to `knock::refresh()`. The difference is that this function will only refresh if the cookie is close to the expire time. How close depends on what you set in the option `cookie.refresh`. The default is 15 minutes before the cookie expires.
-
-```php
-knock::keepAlive();
-```
-
-### knock::getCookieExpires()
-
-Get the cookie expires timestamp.
-
-```php
-echo knock::getCookieExpires();
-```
-
-```php
-<?php
-if(!knock::isLoggedIn()) die('You are not allowed to view this page.');
-
-echo 'Welcome user!';
-```
+| Name                  | Args     | Default                                   | Description                                                                                |
+| --------------------- | -------- | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `isAuthorized()`      | -        | -                                         | Returns `true` if the user `$_POST` password matches the user file password                |
+| `isLoggedIn()`        | -        | -                                         | Returns `true` if the user `$_COOKIE` hash matches the temp file hash (which is salted)    |
+| `getCookieExpires()`  | -        | -                                         | Returns the cookie expires timestamp if it exists                                          |
+| `keepAlive()`         | -        | -                                         | Will run `refresh`, but only if the cookie is close to its expire timestamp                |
+| `login()`             | -        | -                                         | Login a user from `$_POST['username']` and `$_POST['password']` if you use these keys      |
+| `logout()`            | -        | -                                         | It will delete the `$_COOKIE` and remove the temp file                                     |
+| `refresh()`           | -        | -                                         | If logged in, it will create a new hash and expire timestamp                               |
 
 ## Options (optional)
 
@@ -217,6 +139,14 @@ header("Referrer-Policy: no-referrer");
 ## Generate strong passwords
 
 The probably best service out there to generate passwords is https://www.expressvpn.com/password-generator.
+
+## Hacker challenge
+
+Do you think you can hack this thing? I would appreciate if you tried. If you succeed, report in an issue what you did.
+
+Your report should contain a real life case, not a theoretically one. An example of a theoretically hack would be to guess the cookie username and hash. Because even the cookie keys are unknown and different for each installation, it would take the sun to go out before your guess is correct.
+
+I will not pay you anything for the work, but you can get a mention in the readme file and perhaps a link to your site as thanks (if it's not unhealthy).
 
 ## Requirements
 

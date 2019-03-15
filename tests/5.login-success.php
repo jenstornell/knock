@@ -7,7 +7,9 @@ $link = 'http://' . $_SERVER['HTTP_HOST'] . $folder . '/6.login-success-check.ph
 $_POST['postusername'] = 'test@example.com';
 $_POST['postpassword'] = 'test';
 
-if(knock::login()) {
+$knock = new Knock();
+
+if($knock->login()) {
   header("Location: " . $link);
   die;
 }

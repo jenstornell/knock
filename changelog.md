@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8
+
+- Bug fixes
+- Improved error handling
+
 ## 1.7
 
 - Added "Hacker challange" to readme.

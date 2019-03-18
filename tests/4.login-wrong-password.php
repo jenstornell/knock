@@ -7,9 +7,10 @@ $link = 'http://' . $_SERVER['HTTP_HOST'] . $folder . '/5.login-success.php';
 $_POST['postusername'] = 'test@example.com';
 $_POST['postpassword'] = 'test!';
 
-$knock = new Knock();
+$options = include __DIR__ . '/../options.php';
+$knock = new Knock($options);
 
-if(!$knock->login()) {
+if(!$knock->login() && !$knock->isAuthorized()) {
   header("Location: " . $link);
   die;
 }

@@ -2,7 +2,7 @@
 
 PHP authorization class for logging in and logging out. No form is included.
 
-*Version 1.7* [Changelog](changelog.md)
+*Version 1.8* [Changelog](changelog.md)
 
 ## In short
 

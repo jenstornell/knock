@@ -1,11 +1,10 @@
 <?php
 class Knock {
-  private $error = '';
-  private $success = true;
+  private $error = null;
 
   // Set options
-  public function __construct() {
-    $this->options();
+  public function __construct($options = null) {
+    $this->options($options);
   }
 
   ## PRIVATE
@@ -14,8 +13,6 @@ class Knock {
   private function defaults() {
     return [
       'algorithm' => 'sha256',
-      'callback_login' => function($success) { return $success; },
-      'callback_logout' => function($success) { return $success; },
       'cookie_prefix' => 'knock',
       'cookie_refresh' => 15, // Bad key name
       'login_delay' => 500,
@@ -38,17 +35,16 @@ class Knock {
   }
 
   // Set options
-  private function options() {
-    $path = __DIR__ . '/options.php';
+  private function options($options) {
     $array = $this->defaults();
 
-    if(file_exists($path)) {
-      $array = array_merge($this->defaults(), include($path));
+    if($options) {
+      $array = array_merge($this->defaults(), $options);
     }
 
     foreach($array as $key => $value) {
       $this->{$key} = $value;
-    }
+    }    
   }
 
   // Login user
@@ -62,18 +58,21 @@ class Knock {
 
   // Logout user
   private function logoutUser($username) {
-    $path = $this->path_temp . $username . '.php';
-
-    $this->deleteFile($path);
     $this->deleteCookies();
+
+    if($username) {
+      $path = $this->path_temp . $username . '.php';
+      return $this->deleteFile($path);
+    }
+    return true;
   }
 
   // Delete file
   private function deleteFile($path) {
+    echo $path;
     if(file_exists($path)) {
       if(!unlink($path)) {
-        $this->success = false;
-        $this->error = 'delete_file:' . $path;
+        $this->error = [1, $path];
         return;
       }
     }
@@ -84,8 +83,7 @@ class Knock {
   private function makeDir($path) {
     if(!file_exists($path)) {
       if(!mkdir($path)) {
-        $this->error = 'makedir:' . $path;
-        $this->success = false;
+        $this->error = [2, $path];
         return;
       }
     }
@@ -114,7 +112,7 @@ class Knock {
   private function setCookie($key, $value, $expires = null) {
     $expires = ($expires === null) ? $this->setcookie_expires : $expires;
 
-    $this->success = setcookie(
+    $success = setcookie(
       $this->cookie_prefix . $key,
       $value,
       $expires,
@@ -124,10 +122,10 @@ class Knock {
       $this->setcookie_httponly
     );
 
-    if(!$this->success) {
-      $this->error = 'cookie_key:' . $key;
+    if(!$success) {
+      $this->error = [3, $key];
     }
-    return $this->success;
+    return $success;
   }
 
   // Write temp file to disc
@@ -135,12 +133,12 @@ class Knock {
     if(!$this->makeDir($this->path_temp)) return;
 
     $content = "<?php return '" . $this->fileHash($hash) . "';";
-    $this->success = file_put_contents($this->path_temp . $username . '.php', $content);
+    $success = file_put_contents($this->path_temp . $username . '.php', $content);
 
-    if(!$this->success) {
-      $this->error = 'write_file:' . $path;
+    if(!$success) {
+      $this->error = [4, $path];
     }
-    return $this->success;
+    return $success;
   }
 
   private function fileHash($hash) {
@@ -160,8 +158,7 @@ class Knock {
           return true;
         }
       }
-      $this->success = false;
-      $this->error = 'ip';
+      $this->error = [5];
       return;
     }
   }
@@ -181,8 +178,7 @@ class Knock {
     }
 
     if(!file_exists($filepath)) {
-      $this->success = false;
-      $this->error = 'filepath:' . $filepath;
+      $this->error = [6, $filepath];
       return;
     } else {
       return $filepath;
@@ -192,20 +188,16 @@ class Knock {
   // Get cookie
   private function getCookie($key) {
     $key = 'key_' . $key;
-    if(!isset($_COOKIE[$this->cookie_prefix][$this->{$key}])) {
-      $this->success = false;
-      $this->error = 'cookie_key:' . $key;
-      return;
+    if(isset($_COOKIE[$this->cookie_prefix][$this->{$key}])) {
+      return $_COOKIE[$this->cookie_prefix][$this->{$key}];
     }
-    return $_COOKIE[$this->cookie_prefix][$this->{$key}];
   }
 
   // Has post
   private function hasPost($key) {
     $key = 'key_' . $key;
     if(!isset($_POST[$this->{$key}])) {
-      $this->success = false;
-      $this->error = 'post:' . $key;
+      $this->error = [8, $key];
       return;
     }
     return true;
@@ -228,15 +220,13 @@ class Knock {
     $data = include($this->filepath('post'));
 
     if(!isset($data['password'])) {
-      $this->success = false;
-      $this->error = 'password_missing';
+      $this->error = [9];
       return;
     }
     $post_password = hash($this->algorithm, $_POST[$this->key_post_password]);
 
     if($data['password'] !== $post_password) {
-      $this->success = false;
-      $this->error = 'password_unmatched';
+      $this->error = [10];
       return;
     }
     return true;
@@ -244,9 +234,9 @@ class Knock {
 
   // Results
   private function setResults() {
-    $results['success'] = $this->success;
+    $results['success'] = ($this->error === null) ? true : false;
 
-    if(!$this->success) {
+    if($this->error !== null) {
       $results['error'] = $this->error;
     }
     $this->results = $results;
@@ -254,10 +244,11 @@ class Knock {
 
   ## PUBLIC
 
+  // is authorized
   public function isAuthorized() {
     $this->userIsAuthorized();
     $this->setResults();
-    return $this->success;
+    return $this->results['success'];
   }
 
   // Check if user is logged in with cookie
@@ -270,17 +261,33 @@ class Knock {
     $hash_cookie = hash($this->algorithm, $hash_cookie . $this->salt);
 
     if($hash != $hash_cookie) {
-      $this->success = false;
-      $this->error = 'hash_unmatched';
+      $this->error = [11];
     }
 
     $this->setResults();
-    return $this->success;
+    return $this->results['success'];
   }
 
   // Get the cookies expire timestamp
   public function getCookieExpires() {
     return $this->getCookie('cookie_expires');
+  }
+
+  // Create user
+  public function createUser($username = null, $password = null) {
+    if(!$username || !$password) {
+      $this->error = [12];
+    } elseif(file_exists($this->path_users . $username . '.php')) {
+      $this->error = [13];
+    } else {
+      $content = sprintf("<?php return ['password' => '%s'];", hash('sha256', $password));
+      $success = file_put_contents($this->path_users . $username . '.php', $content);
+      if(!$success) {
+        $this->error = [14];
+      }
+    }
+    $this->setResults();
+    return $this->results['success'];
   }
 
   // Refresh the cookies if the cookies will soon expire
@@ -298,14 +305,14 @@ class Knock {
       $this->loginUser($_POST[$this->key_post_username]);
     }
     $this->setResults();
-    
-    return $this->success;
+    return $this->results['success'];
   }
 
   // Logout
   public function logout() {
     $this->logoutUser($this->getCookie('cookie_username'));
     $this->setResults();
+    print_r($this->results);
     return $this->results['success'];
   }
 

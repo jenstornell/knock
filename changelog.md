@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9
+
+- Almost complete rewrite into multiple classes
+- New tests
+- Options is no longer called from a file, but from an input array
+
 ## 1.8
 
 - Bug fixes

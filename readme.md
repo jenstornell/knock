@@ -2,11 +2,10 @@
 
 PHP authorization class for logging in and logging out. No form is included.
 
-*Version 1.8* [Changelog](changelog.md)
+*Version 1.9* [Changelog](changelog.md)
 
 ## In short
 
-- Only 1 class
 - Persistent cookie
 - Whitelist of IPs
 - Plenty of options
@@ -72,6 +71,7 @@ To use the options you need to place a `options.php` file in the root.
 
 ```php
 return [
+  'algorithm' => 'sha256',
   'cookie_prefix' => 'knock',
   'cookie_refresh' => 15,
   'login_delay' => 500,

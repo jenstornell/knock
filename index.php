@@ -1,11 +1,14 @@
 <?php
 include __DIR__ . '/knock.php';
 
-$_POST['postusername'] = 'test@example.com';
-$_POST['postpassword'] = 'test';
+/*$_POST['username'] = 'test@example.com';
+$_POST['password'] = 'test';
 
 $knock = new Knock([
   'login_delay' => 100
 ]);
 
-echo $knock->login();
+
+print_r($knock->login());*/
+
+#print_r($knock->results);

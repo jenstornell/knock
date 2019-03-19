@@ -1,6 +1,9 @@
 <?php
 include __DIR__ . '/../knock.php';
 
+$folder = dirname($_SERVER['PHP_SELF']);
+$link = 'http://' . $_SERVER['HTTP_HOST'] . $folder . '/cookie-expires.php';
+
 $options = [
   'cookie_prefix' => 'knock',
   'setcookie_path' => '/misc/knock/',
@@ -17,9 +20,16 @@ $options = [
 
 $knock = new Knock($options);
 
-$_POST['postusername'] = 'test@example.com';
-$_POST['postpassword'] = 'test';
+if(isset($_GET['action'])) {
+  if($_GET['action'] === 'start') {
+    $_POST['postusername'] = 'test@example.com';
+    $_POST['postpassword'] = 'test';
 
-$knock->login();
+    $login = $knock->login();
 
-if($knock->getCookieExpires() > 2) echo true;
+    if(!$login['success']) die;
+    header("Location: " . $link);
+  }
+} else {
+  if($knock->getCookieExpires() > 2) echo true;
+}

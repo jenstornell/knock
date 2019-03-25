@@ -59,12 +59,29 @@ class Knock {
     }
   }
 
-  // BOOLEAN
-  
+  // STRING/INT
+
   // Get the cookies expire timestamp
   public function getCookieExpires() {
     return $this->Cookie->getCookie('cookie_expires');
   }
+
+  // Get all options
+  public function getOptions() {
+    return knocko();
+  }
+
+  // Get username
+  public function getUsername() {
+    return $this->Cookie->getCookie('cookie_username');
+  }
+
+  // Get userpath
+  public function getUserpath() {
+    return realpath(knocko('path_users') . '/' . $this->Cookie->getCookie('cookie_username') . '.php');
+  }
+
+  // BOOLEAN
 
   // is authorized
   public function isAuthorized() {

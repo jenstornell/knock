@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0
+
+- Updated TinyOptions
+- Added `getOptions`, `getUsername` and `getUserpath` methods
+
 ## 1.9
 
 - Almost complete rewrite into multiple classes

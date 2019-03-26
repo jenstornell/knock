@@ -65,20 +65,26 @@ class Cookie {
   }
 
   // Refresh the cookies if the cookies will soon expire
-  public function keepAlive() {
-    return ($this->ExpireTimeLeft(knocko('cookie_refresh')) < 0) ? $this->refresh() : true;
+  public function keepAlive($login) {
+    return ($this->ExpireTimeLeft(knocko('cookie_refresh')) < 0) ? $this->refresh($login) : true;
   }
 
-  // Expire timeleft - MISSING FUNCTION getCookieExpires
+  // Refresh
+  public function refresh($login) {
+    if(!$login->isLoggedIn()) return;
+    $login->loginUser($this->getCookie('cookie_username'));
+  }
+
+  // Expire timeleft
   private function ExpireTimeLeft($refresh) {
-    $minutes = round(((int)$this->getCookieExpires()-time())/60);
+    $minutes = round(((int)$this->getCookie('cookie_expires')-time())/60);
     $diff = $minutes - $refresh;
     return $diff;
   }
 
   // Has cookies
   public function hasCookies() {
-    if(!$this->getCookie('cookie_expires')) return;
+    if($this->getCookie('cookie_expires') === null) return;
     if(!$this->getCookie('cookie_hash')) return;
     if(!$this->getCookie('cookie_username')) return;
 

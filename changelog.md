@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1
+
+- Fixed bug with keepAlive
+
 ## 2.0
 
 - Updated TinyOptions

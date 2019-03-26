@@ -95,7 +95,7 @@ class Knock {
 
   // Keep alive
   public function keepAlive() {
-    return $this->Cookie->keepAlive();
+    return $this->Cookie->keepAlive($this->Login);
   }
 
   // PRIVATE

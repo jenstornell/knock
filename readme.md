@@ -2,7 +2,7 @@
 
 PHP authorization class for logging in and logging out. No form is included.
 
-*Version 2.0* [Changelog](changelog.md)
+*Version 2.1* [Changelog](changelog.md)
 
 ## In short
 
@@ -26,7 +26,7 @@ The folder structure may look like below where filename should be `[username].ph
 #### Inside the user file
 
 - Inside the user file you return an array including the password.
-- To use the password `test` you need to hash it with a tool like [SHA256 Hash Generator](https://passwordsgenerator.net/sha256-hash-generator/).
+- To use the password `test` you need to hash it with a tool like [SHA256 online hash function](https://emn178.github.io/online-tools/sha256.html).
 - *You can also use `hash('sha256', 'test')` as the password, but that is not recommended. Use it for testing purposes only!*
 
 ```php
